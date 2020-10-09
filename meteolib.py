@@ -8,7 +8,8 @@
 #                    - RHI        -  Relative humidity with respect to ice
 #                    - ES         -  Saturation water vapour pressure
 #                    - ESI        -  Saturation water vapour pressure w.r.t. ice
-#                    - Lv         -  Latent heat of vaporization
+#                    - LV         -  Latent heat of vaporization
+#                    - NU         -  Air kinematic viscosity 
 #
 # Author : Virginie Guemas - 2020
 ################################################################################
@@ -59,7 +60,7 @@ def Thetae(T,q,P) :
    check_T(T)
    check_q(q)
 
-   thetae = (T + Lv(T)/cp*q)*(1000/P)**(Ra/cp)        
+   thetae = (T + LV(T)/cp*q)*(1000/P)**(Ra/cp)        
 
    return thetae
 ################################################################################
@@ -185,7 +186,7 @@ def ESI(T) :
 
    return es
 ################################################################################
-def Lv(T) :
+def LV(T) :
    """
    This function computes the latent heat of vaporisation/condensation in J.kg-1 as a function of temperature in Kelvin.
    """
@@ -197,6 +198,15 @@ def Lv(T) :
    Lv = 2500.8 - 2.36*TC + 0.0016*TC**2 - 0.00006*TC**3
 
    return Lv*1000
+################################################################################
+def NU(T):
+   """
+   This function computes the air kinematic viscosity as a function of temperature (in Kelvin). (Fit from Pierre Bouteloup)
+   """
+  
+   nu = - 1.1555*10**(-14)*T**3 + 9.5728*10**(-11)*T**2 + 3.7604*10**(-8)*T -3.4484*10**(-6)
+
+   return nu
 ################################################################################
 def check_q(q):
    """
