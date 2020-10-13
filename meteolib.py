@@ -132,9 +132,9 @@ def RH(q,T,P,case=2) :
    TC = T - 273.15 
 
    if case == 1:
-     e = q * P / (0.378 * q + 0.622)
+     e = q * P / ((Rv-Ra)/Rv*q + (Ra/Rv))
    elif case == 2:
-     e = q * P / 0.622
+     e = q * P / (Ra/Rv)  # Assumption that R humid air = R dry air
    else:
      sys.exit('Unknow case')
 
@@ -200,16 +200,21 @@ def ESI(T) :
 
    return es
 ################################################################################
-def LV(T) :
+def LV(T,case=1) :
    """
    This function computes the latent heat of vaporisation/condensation in J.kg-1 as a function of temperature in Kelvin.
    """
 
-   check_T(T)
+   if case == 1:
+     check_T(T)
+     TC = T - 273.15
+     Lv = 2500.8 - 2.36*TC + 0.0016*TC**2 - 0.00006*TC**3
 
-   TC = T - 273.15
+   elif case == 2:
+     Lv = 2500.0
 
-   Lv = 2500.8 - 2.36*TC + 0.0016*TC**2 - 0.00006*TC**3
+   else:
+     sys.exit('Unknown case')
 
    return Lv*1000
 ################################################################################
