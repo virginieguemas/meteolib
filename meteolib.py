@@ -4,6 +4,8 @@
 #                    - Thetav     -  Virtual potential temperature
 #                    - Thetae     -  Equivalent potential temperature
 #                    - TD         -  Dew point
+#                    - RW         -  Water mass miwing ratio
+#                    - Q          -  Specific humidity
 #                    - RH         -  Relative humidity
 #                    - RHI        -  Relative humidity with respect to ice
 #                    - ES         -  Saturation water vapour pressure
@@ -121,22 +123,69 @@ def TD(T,case=2,rh=None,q=None,P=None) :
 
    return Tdew
 ################################################################################
-def RH(q,T,P,case=2) :
-   """ 
-   This function computes the relative humidity in % from the specific humidity in kg/kg, the temperature in Kelvin and the pressure in hPa.
+def RW(q):
+   """
+   This function computes the water mass mixing ratio (in kg/kg) as a function of the specific humidity (in kg/kg)
    """
 
-   check_q(q)
-   check_T(T)
+   r = q/(1-q)
 
-   TC = T - 273.15 
-
-   if case == 1:
-     e = q * P / ((Rv-Ra)/Rv*q + (Ra/Rv))
-   elif case == 2:
-     e = q * P / (Ra/Rv)  # Assumption that R humid air = R dry air
+   return r
+################################################################################
+def Q(P,rh=None,Td=None,T=None):
+   """
+   This function computes the specific humidity (in kg/kg) as a function of :
+   - the dew point temperature Td (in Kelvin), 
+   - the pressure P (in hPa)
+   or as a function of :
+   - the relative humidity rh (in %),
+   - the temperature (in Kelvin),
+   - the pressure (in hPa). 
+   """
+ 
+   if Td is not None :
+     check_T(Td)
+     e = ES(Td)
+   elif rh is not None and T is not None:
+     check_T(T)
+     check_rh(rh)
+     e = rh * ES(T) / 100
    else:
-     sys.exit('Unknow case')
+     sys.exit('q can be computed from (Td,P) or from (rh,T,P)')
+
+   q = (e*Ra)/(P*Rv) # Assumption that R humid air = R dry air
+ 
+   return q
+################################################################################
+def RH(T,Td=None,q=None,P=None,case=2) :
+   """ 
+   This function computes the relative humidity in % as a function of:
+   - the specific humidity in kg/kg, 
+   - the temperature in Kelvin,
+   - the pressure in hPa
+   or as a function of:
+   - the dew point temperature in Kelvin,
+   - the temperature in Kelvin.
+   """
+
+   check_T(T)
+   
+   if Td is not None:
+     check_T(Td)
+     e = ES(Td)
+   elif q is not None and P is not None:
+     check_q(q)
+     TC = T - 273.15 
+
+     if case == 1:
+       e = q * P / ((Rv-Ra)/Rv*q + (Ra/Rv))
+     elif case == 2:
+       e = q * P / (Ra/Rv)  # Assumption that R humid air = R dry air
+     else:
+       sys.exit('Unknow case')
+   
+   else:
+     sys.exit('RH can be computed from (T,Td) or from (T,Q,P)')
 
    rh = e / ES(T) * 100
 
@@ -150,7 +199,7 @@ def RHI(q,T,P):
    check_q(q)
    check_T(T)
 
-   e = q * P / 0.622
+   e = q * P / (Ra/Rv)
 
    rhi = e / ESI(T) * 100
 
