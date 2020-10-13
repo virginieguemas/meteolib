@@ -16,25 +16,39 @@
 import numpy as np
 import sys
 
-cp = 1005.7 # J.K-1.kg-1
+cp = 1004   # J.K-1.kg-1
 cpv= 1860.0 # J.K-1.kg-1
-Ra = 287.04 # J.K-1.kg-1
+Ra = 287    # J.K-1.kg-1
 Rv = 461.4  # J.K-1.kg-1
 ################################################################################
-def Theta(T,P,q=None) :
+def Theta(z=None,T=None,P=None,q=None) :
    """ 
-   This function computes the potential temperature in Kelvin as a function of the temperature in Kelvin, the pressure in hPa and, optionally, the specific humidity in kg/kg.
+   This function computes the potential temperature in Kelvin as a function of:
+   - the temperature T in Kelvin,
+   - the height z in m,
+   or as a function of :
+   - the temperature T in Kelvin, 
+   - the pressure P in hPa, 
+   - optionally, the specific humidity in kg/kg.
    """
    
-   check_T(T)
-
-   if q is None:
-     kappa = Ra/cp
+   if T is not None:
+     check_T(T)
    else:
-     check_q(q)
-     kappa = (Ra*(1-q)+Rv*q)/(cp*(1-q)+cpv*q) 
+     sys.exit('Whichever method you choose, you need to provide T')
 
-   theta = T * (1000/P)**(Ra/cp)
+   if z is not None:
+     gamma = 0.00975 # K.m-1 (as in Peterson and Renfrew, QJRMS, 2009)
+     theta = T + gamma*z  # Approximation with substantial errors for flights
+   elif P is not None:
+     if q is None:
+       kappa = Ra/cp
+     else:
+       check_q(q)
+       kappa = (Ra*(1-q)+Rv*q)/(cp*(1-q)+cpv*q) 
+     theta = T * (1000/P)**kappa
+   else:
+     sys.exit('theta can be computed from (T,z), from (T,P) or from (T,P,q)')
 
    return theta
 ################################################################################
