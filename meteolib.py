@@ -41,6 +41,8 @@ def Theta(z=None,T=None,P=None,q=None) :
 
    if z is not None:
      gamma = 0.00975 # K.m-1 (as in Peterson and Renfrew, QJRMS, 2009)
+                     # Fairall et al (1996) use 0.0098
+                     # Smith (1988) uses 0.01
      theta = T + gamma*z  # Approximation with substantial errors for flights
    elif P is not None:
      if q is None:
@@ -132,7 +134,7 @@ def RW(q):
 
    return r
 ################################################################################
-def Q(P,rh=None,Td=None,T=None):
+def Q(P,rh=None,Td=None,T=None,case=2):
    """
    This function computes the specific humidity (in kg/kg) as a function of :
    - the dew point temperature Td (in Kelvin), 
@@ -145,7 +147,7 @@ def Q(P,rh=None,Td=None,T=None):
  
    if Td is not None :
      check_T(Td)
-     e = ES(Td)
+     e = ES(Td,case=2)
    elif rh is not None and T is not None:
      check_T(T)
      check_rh(rh)
@@ -153,7 +155,12 @@ def Q(P,rh=None,Td=None,T=None):
    else:
      sys.exit('q can be computed from (Td,P) or from (rh,T,P)')
 
-   q = (e*Ra)/(P*Rv) # Assumption that R humid air = R dry air
+   if case == 1:
+     q = (e*Ra)/(P*Rv) / (1 - e*(Rv-Ra)/(Rv*P))
+   elif case == 2:
+     q = (e*Ra)/(P*Rv) # Assumption that R humid air = R dry air
+   else:
+     sys.exit('Unknown case')
  
    return q
 ################################################################################
