@@ -269,17 +269,32 @@ def LV(T,case=1) :
    elif case == 2:
      Lv = 2500.0
 
+   elif case == 3: # Fleagle & Businger (1980) p113 used in Fairall et al (1996)
+     check_T(T)
+     TC = T - 273.15
+     Lv = (25 - 0.022274*TC)*10**5
+
    else:
      sys.exit('Unknown case')
 
    return Lv*1000
 ################################################################################
-def NU(T):
+def NU(T,case=1):
    """
-   This function computes the air kinematic viscosity as a function of temperature (in Kelvin). (Fit from Pierre Bouteloup)
+   This function computes the air kinematic viscosity as a function of temperature (in Kelvin). 
    """
   
-   nu = - 1.1555*10**(-14)*T**3 + 9.5728*10**(-11)*T**2 + 3.7604*10**(-8)*T -3.4484*10**(-6)
+   check_T(T)
+
+   if case == 1: # Fit from Pierre Bouteloup
+     nu = - 1.1555*10**(-14)*T**3 + 9.5728*10**(-11)*T**2 + 3.7604*10**(-8)*T -3.4484*10**(-6)
+
+   elif case == 2: # Fit from Andreas (1989) used in Fairal et al (1996)
+     TC = T - 273.15
+     nu = 1.326*10**(-5)*(1 + 6.542*10**(-3)*TC + 8.301*10**(-6)*TC**2 - 4.840*10**(-9)*T**3)
+
+   else:
+     sys.exit('Unknown case')
 
    return nu
 ################################################################################
