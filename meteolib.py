@@ -59,6 +59,7 @@ def Theta(z=None,T=None,P=None,q=None) :
 def Thetav(theta,q) :
    """ 
    This function computes the virtual potential temperature in Kelvin as a function of the potential temperature in Kelvin and specific humidity in kg/kg.
+   It can also be used to compute the virtual temperature in Kelvin as a function of the temperature in Kelvin and specific humidity in kg/kg.
    """
   
    check_T(theta)
@@ -78,7 +79,7 @@ def Thetae(T,q,P) :
    check_T(T)
    check_q(q)
 
-   thetae = (T + LV(T)/cp*q)*(1000/P)**(Ra/cp)        
+   thetae = Theta(T = T + LV(T)/cp*q, P = P)        
 
    return thetae
 ################################################################################
@@ -279,7 +280,7 @@ def LV(T,case=1) :
 
    return Lv*1000
 ################################################################################
-def NU(T,case=1):
+def NU(T,case=2):
    """
    This function computes the air kinematic viscosity as a function of temperature (in Kelvin). 
    """
