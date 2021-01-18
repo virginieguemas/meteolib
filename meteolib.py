@@ -22,7 +22,7 @@ import sys
 
 cp = 1004   # J.K-1.kg-1
 cpv= 1860.0 # J.K-1.kg-1
-Ra = 287    # J.K-1.kg-1
+Ra = 287.04 # J.K-1.kg-1
 Rv = 461.4  # J.K-1.kg-1
 ################################################################################
 def Theta(z=None,T=None,P=None,q=None) :
@@ -298,19 +298,21 @@ def LV(T,case=1) :
 
    Author : Virginie Guemas - 2020
    """
+   check_T(T)
+   TC = T - 273.15
 
    if case == 1:
-     check_T(T)
-     TC = T - 273.15
      Lv = 2500.8 - 2.36*TC + 0.0016*TC**2 - 0.00006*TC**3
+     # Polynomial curve fits to Table 2.1. R. R. Rogers; M. K. Yau (1989). A Short Course in Cloud Physics (3rd ed.). Pergamon Press. p. 16. ISBN 0-7506-3215-1.
 
    elif case == 2:
      Lv = 2500.0
 
    elif case == 3: # Fleagle & Businger (1980) p113 used in Fairall et al (1996)
-     check_T(T)
-     TC = T - 273.15
-     Lv = (25 - 0.022274*TC)*10**5
+     Lv = (25 - 0.022274*TC)*10**2
+
+   elif case == 4: # Bolton (1980) used by Elvidge et al (2016)
+     Lv = (2.501 - 0.00237*TC)*10**3
 
    else:
      sys.exit('Unknown case')
