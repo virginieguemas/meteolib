@@ -50,6 +50,7 @@ def Theta(z=None,T=None,P=None,q=None) :
      else:
        check_q(q)
        kappa = (Ra*(1-q)+Rv*q)/(cp*(1-q)+cpv*q) 
+       # Differences with Ra/cp are negligible 
      theta = T * (1000/P)**kappa
    else:
      sys.exit('theta can be computed from (T,z), from (T,P) or from (T,P,q)')
@@ -82,6 +83,17 @@ def Thetae(T,q,P) :
    thetae = Theta(T = T + LV(T)/cp*q, P = P)        
 
    return thetae
+################################################################################
+def T(theta,P) :
+   """
+   This function computes the tempteraure in Kelvin from the potential temperature in Kelvin and the pressure in hPa.
+   """
+
+   check_T(theta)
+
+   T = theta * (P/1000)**(Ra/cp)     
+   
+   return T
 ################################################################################
 def TD(T,case=2,rh=None,q=None,P=None) :
    """ 
@@ -181,10 +193,9 @@ def RH(T,Td=None,q=None,P=None,case=2) :
    if Td is not None:
      check_T(Td)
      e = ES(Td)
+
    elif q is not None and P is not None:
      check_q(q)
-     TC = T - 273.15 
-
      if case == 1:
        e = q * P / ((Rv-Ra)/Rv*q + (Ra/Rv))
      elif case == 2:
