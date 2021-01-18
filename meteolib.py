@@ -3,6 +3,7 @@
 # List of functions: - Theta      -  Potential temperature
 #                    - Thetav     -  Virtual potential temperature
 #                    - Thetae     -  Equivalent potential temperature
+#                    - T          -  Temperature
 #                    - TD         -  Dew point
 #                    - RW         -  Water mass miwing ratio
 #                    - Q          -  Specific humidity
@@ -12,6 +13,7 @@
 #                    - ESI        -  Saturation water vapour pressure w.r.t. ice
 #                    - LV         -  Latent heat of vaporization
 #                    - NU         -  Air kinematic viscosity 
+#                    - RHO        -  Air density
 #
 # Author : Virginie Guemas - 2020
 ################################################################################
@@ -32,6 +34,8 @@ def Theta(z=None,T=None,P=None,q=None) :
    - the temperature T in Kelvin, 
    - the pressure P in hPa, 
    - optionally, the specific humidity in kg/kg.
+
+   Author : Virginie Guemas - 2020
    """
    
    if T is not None:
@@ -61,6 +65,8 @@ def Thetav(theta,q) :
    """ 
    This function computes the virtual potential temperature in Kelvin as a function of the potential temperature in Kelvin and specific humidity in kg/kg.
    It can also be used to compute the virtual temperature in Kelvin as a function of the temperature in Kelvin and specific humidity in kg/kg.
+
+   Author : Virginie Guemas - 2020
    """
   
    check_T(theta)
@@ -75,6 +81,8 @@ def Thetav(theta,q) :
 def Thetae(T,q,P) :
    """
    This function computes the equivalent potential temperature in Kelvin as a function of the temperature in Kelvin, the specific humidity in kg/kg and the pressure in hPa.
+
+   Author : Virginie Guemas - 2020
    """
 
    check_T(T)
@@ -87,6 +95,8 @@ def Thetae(T,q,P) :
 def T(theta,P) :
    """
    This function computes the tempteraure in Kelvin from the potential temperature in Kelvin and the pressure in hPa.
+
+   Author : Virginie Guemas - January 2021
    """
 
    check_T(theta)
@@ -98,6 +108,8 @@ def T(theta,P) :
 def TD(T,case=2,rh=None,q=None,P=None) :
    """ 
    This function computes the dew point temperature in Kelvin from the temperature in Kelvin and relative humidity in % or specific humidity in kg/kg and pressure in hPa.
+
+   Author : Virginie Guemas - 2020
    """
 
    check_T(T)
@@ -141,6 +153,8 @@ def TD(T,case=2,rh=None,q=None,P=None) :
 def RW(q):
    """
    This function computes the water mass mixing ratio (in kg/kg) as a function of the specific humidity (in kg/kg)
+
+   Author : Virginie Guemas - 2020
    """
 
    r = q/(1-q)
@@ -156,6 +170,8 @@ def Q(P,rh=None,Td=None,T=None,case=2):
    - the relative humidity rh (in %),
    - the temperature (in Kelvin),
    - the pressure (in hPa). 
+
+   Author : Virginie Guemas - 2020
    """
  
    if Td is not None :
@@ -186,6 +202,8 @@ def RH(T,Td=None,q=None,P=None,case=2) :
    or as a function of:
    - the dew point temperature in Kelvin,
    - the temperature in Kelvin.
+
+   Author : Virginie Guemas - 2020
    """
 
    check_T(T)
@@ -213,6 +231,8 @@ def RH(T,Td=None,q=None,P=None,case=2) :
 def RHI(q,T,P):
    """
    This function computes the relative humidity with respect to ice in % from the specific humidity in kg/kg, the temperature in Kelvin, and the pressure in hPa.
+
+   Author : Virginie Guemas - 2020
    """
 
    check_q(q)
@@ -226,6 +246,8 @@ def RHI(q,T,P):
 ################################################################################
 def ES(T,case=2):
    """ This function computes the saturation vapour pressure in hPa as a function of the temperature in Kelvin.
+
+   Author : Virginie Guemas - 2020
    """
 
    check_T(T)
@@ -254,6 +276,8 @@ def ES(T,case=2):
 def ESI(T) :
    """
    This function computes the saturation vapour pressure with respect to ice in hPa as a function of the temperature in Kelvin.
+
+   Author : Virginie Guemas - 2020
    """
 
    check_T(T)
@@ -271,6 +295,8 @@ def ESI(T) :
 def LV(T,case=1) :
    """
    This function computes the latent heat of vaporisation/condensation in J.kg-1 as a function of temperature in Kelvin.
+
+   Author : Virginie Guemas - 2020
    """
 
    if case == 1:
@@ -294,6 +320,8 @@ def LV(T,case=1) :
 def NU(T,case=2):
    """
    This function computes the air kinematic viscosity as a function of temperature (in Kelvin). 
+
+   Author : Virginie Guemas - 2020
    """
   
    check_T(T)
@@ -310,30 +338,47 @@ def NU(T,case=2):
 
    return nu
 ################################################################################
+def RHO(P,T,q):
+   """ 
+   This function computes the air density in kg/m3 as a function of pressure (in hPa), temperature (in Kelvin) and specific humidity (in kg/kg).
+    
+   Author : Virginie Guemas - January 2021
+   """
+   check_T(T)
+   check_q(q)
+
+   R = Ra*(1-q) + Rv*q 
+   rho = 100*P/(R*T)
+
+   return rho
+################################################################################
 def check_q(q):
    """
    This function checks whether the specific humidity is most probably specified in g/kg or kg/kg. It exits in case the unit is g/kg with an error message.
+   Author : Virginie Guemas - 2020
    """
 
-   if np.max(q) > 0.1 :
+   if np.nanmax(q) > 0.1 :
      sys.exit('Specific humidity q should be provided in kg/kg')
 
 ################################################################################
 def check_T(T):
-    """
-    This function checks whether the temperature is most probably provided in Kelvin or Celsius degrees. It exits in case the unit is Celsius degrees with an error message.
-    """
+   """
+   This function checks whether the temperature is most probably provided in Kelvin or Celsius degrees. It exits in case the unit is Celsius degrees with an error message.
+   Author : Virginie Guemas - 2020
+   """
 
-    if (np.min(T)) < 100 :
-      sys.exit('Temperature should be provided in Kelvin degrees')
+   if (np.nanmin(T)) < 100 :
+     sys.exit('Temperature should be provided in Kelvin degrees')
 
 ################################################################################
 def check_rh(rh):
-    """
-    This function checks whether the relative humidity is most probably expressed in % or in fraction. It exits in case the unit is fractional with an error message.
-    """
+   """
+   This function checks whether the relative humidity is most probably expressed in % or in fraction. It exits in case the unit is fractional with an error message.
+   Author : Virginie Guemas - 2020
+   """
 
-    if (np.max(rh)) < 0.1 :
-      sys.exit('The relative humidity rh is expressed in %. 0 < rh < 100')
+   if (np.nanmax(rh)) < 0.1 :
+     sys.exit('The relative humidity rh is expressed in %. 0 < rh < 100')
 
 ################################################################################
