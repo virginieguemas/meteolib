@@ -78,7 +78,7 @@ def Thetav(theta,q) :
 
    return thetav
 ################################################################################
-def Thetae(T,q,P) :
+def Thetae(T,q,P,case=4) :
    """
    This function computes the equivalent potential temperature in Kelvin as a function of the temperature in Kelvin, the specific humidity in kg/kg and the pressure in hPa.
 
@@ -88,7 +88,23 @@ def Thetae(T,q,P) :
    check_T(T)
    check_q(q)
 
-   thetae = Theta(T = T + LV(T)/cp*q, P = P)        
+   if case == 1:
+     Td = TD(T=T, q=q, P=P)
+     Tl = (1/(Td-56)+np.log(T/Td)/800)**(-1)+56  
+   elif case == 2:
+     e = ES(TD(T=T, q=q, P=P))
+     Tl = 2840/(3.5*np.log(T)-np.log(e)-4.805)+55
+   elif case == 3:
+     rh = RH(T=T, q=q, P=P)
+     Tl = (1/(T-55)-np.log(rh/100)/2840)**(-1)+55
+   elif case == 4: # my formula which seems completely different from Bolton
+     thetae = Theta(T = T + LV(T)/cp*q, P = P)
+   else: 
+     sys.exit('Unknow case')
+   
+   if case == 1 or case == 2 or case == 3 : 
+     r = RW(q)
+     thetae = T*(1000/P)**(0.2854*(1-0.00028*r))*np.exp((3.376/Tl-0.00254)*r*(1+0.00081*r))
 
    return thetae
 ################################################################################
@@ -122,7 +138,7 @@ def TD(T,case=2,rh=None,q=None,P=None) :
        sys.exit('If rh is not provided, both q and P should be')
      else:
        check_q(q)
-       rh = RH(q,T,P)  
+       rh = RH(q=q,T=T,P=P)  
    else:
      check_rh(rh)
      print('The relative humidity provided is used')
@@ -244,7 +260,7 @@ def RHI(q,T,P):
 
    return rhi
 ################################################################################
-def ES(T,case=2):
+def ES(T,case=1):
    """ This function computes the saturation vapour pressure in hPa as a function of the temperature in Kelvin.
 
    Author : Virginie Guemas - 2020
@@ -256,7 +272,10 @@ def ES(T,case=2):
 
    # August-Roche-Magnus (or Magnus-Tetens or Magnus)
    if case == 1:
+   # Fit to Wexler (1976) cited by Bolton MWR (1980)
      es = 6.112 * np.exp((17.67 * TC)/(TC + 243.5))
+     # 0.1% error
+     # Best choice according to Bolton 1980
    elif case == 2:
      es = 6.1094 * np.exp((17.625 * TC)/(TC + 243.04))
    # Tetens - lower than the others
@@ -268,6 +287,15 @@ def ES(T,case=2):
    elif case == 5: 
    # NASA GISS
      es = 6.108 * np.exp(2500000 * (0.00000793252 - 0.002166847/T)) 
+   elif case == 6:
+   # Tetens (1930) cited by Bolton MWR (1980)
+     es = 6.11 * 10**((7.5 * TC)/(TC + 237.3))
+     # 2% error at low temperature according to Murray (1967)
+   elif case == 7:
+   # Wexler (1976) cited by Bolton MWR (1980)
+     # There is a mistake in the formula. I can not find it.
+     es = np.exp(-2991.2729*(T**(-2)) -6017.0128*(T**(-1)) +18.87643854 -0.028354721*T +0.000017838301*(T**2) -8.4150417*(10**(-10))*(T**3) +4.4412543*(10**(-13))*(T**4) +2.858487*np.log(T))
+     # 0.005% error
    else:
      sys.exit('Unknow case')
 
@@ -292,7 +320,7 @@ def ESI(T) :
 
    return es
 ################################################################################
-def LV(T,case=1) :
+def LV(T, case=3) :
    """
    This function computes the latent heat of vaporisation/condensation in J.kg-1 as a function of temperature in Kelvin.
 
