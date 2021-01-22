@@ -19,6 +19,7 @@
 ################################################################################
 import numpy as np
 import sys
+from uncertainties import unumpy as unp
 
 cp = 1004   # J.K-1.kg-1
 cpv= 1860.0 # J.K-1.kg-1
@@ -90,13 +91,13 @@ def Thetae(T,q,P,case=4) :
 
    if case == 1:
      Td = TD(T=T, q=q, P=P)
-     Tl = (1/(Td-56)+np.log(T/Td)/800)**(-1)+56  
+     Tl = (1/(Td-56)+unp.log(T/Td)/800)**(-1)+56  
    elif case == 2:
      e = ES(TD(T=T, q=q, P=P))
-     Tl = 2840/(3.5*np.log(T)-np.log(e)-4.805)+55
+     Tl = 2840/(3.5*unp.log(T)-unp.log(e)-4.805)+55
    elif case == 3:
      rh = RH(T=T, q=q, P=P)
-     Tl = (1/(T-55)-np.log(rh/100)/2840)**(-1)+55
+     Tl = (1/(T-55)-unp.log(rh/100)/2840)**(-1)+55
    elif case == 4: # my formula which seems completely different from Bolton
      thetae = Theta(T = T + LV(T)/cp*q, P = P)
    else: 
@@ -104,7 +105,7 @@ def Thetae(T,q,P,case=4) :
    
    if case == 1 or case == 2 or case == 3 : 
      r = RW(q)
-     thetae = T*(1000/P)**(0.2854*(1-0.00028*r))*np.exp((3.376/Tl-0.00254)*r*(1+0.00081*r))
+     thetae = T*(1000/P)**(0.2854*(1-0.00028*r))*unp.exp((3.376/Tl-0.00254)*r*(1+0.00081*r))
 
    return thetae
 ################################################################################
@@ -160,7 +161,7 @@ def TD(T,case=2,rh=None,q=None,P=None) :
    else:
      sys.exit('Unknow case')
 
-   gamma = np.log(rh/100) + b*TC/(c+TC)
+   gamma = unp.log(rh/100) + b*TC/(c+TC)
 
    Tdew = (c * gamma)/(b - gamma) + 273.15
 
@@ -273,20 +274,20 @@ def ES(T,case=1):
    # August-Roche-Magnus (or Magnus-Tetens or Magnus)
    if case == 1:
    # Fit to Wexler (1976) cited by Bolton MWR (1980)
-     es = 6.112 * np.exp((17.67 * TC)/(TC + 243.5))
+     es = 6.112 * unp.exp((17.67 * TC)/(TC + 243.5))
      # 0.1% error
      # Best choice according to Bolton 1980
    elif case == 2:
-     es = 6.1094 * np.exp((17.625 * TC)/(TC + 243.04))
+     es = 6.1094 * unp.exp((17.625 * TC)/(TC + 243.04))
    # Tetens - lower than the others
    elif case == 3:
-     es = 6.1078 * np.exp((17.27 * TC)/(TC + 237.3))
+     es = 6.1078 * unp.exp((17.27 * TC)/(TC + 237.3))
    elif case == 4:
    # Buck
-     es = 6.1121 * np.exp ((18.678 - TC/234.5)*(TC/(257.14+TC)))
+     es = 6.1121 * unp.exp ((18.678 - TC/234.5)*(TC/(257.14+TC)))
    elif case == 5: 
    # NASA GISS
-     es = 6.108 * np.exp(2500000 * (0.00000793252 - 0.002166847/T)) 
+     es = 6.108 * unp.exp(2500000 * (0.00000793252 - 0.002166847/T)) 
    elif case == 6:
    # Tetens (1930) cited by Bolton MWR (1980)
      es = 6.11 * 10**((7.5 * TC)/(TC + 237.3))
@@ -294,7 +295,7 @@ def ES(T,case=1):
    elif case == 7:
    # Wexler (1976) cited by Bolton MWR (1980)
      # There is a mistake in the formula. I can not find it.
-     es = np.exp(-2991.2729*(T**(-2)) -6017.0128*(T**(-1)) +18.87643854 -0.028354721*T +0.000017838301*(T**2) -8.4150417*(10**(-10))*(T**3) +4.4412543*(10**(-13))*(T**4) +2.858487*np.log(T))
+     es = unp.exp(-2991.2729*(T**(-2)) -6017.0128*(T**(-1)) +18.87643854 -0.028354721*T +0.000017838301*(T**2) -8.4150417*(10**(-10))*(T**3) +4.4412543*(10**(-13))*(T**4) +2.858487*unp.log(T))
      # 0.005% error
    else:
      sys.exit('Unknow case')
@@ -313,10 +314,10 @@ def ESI(T) :
    TC = T - 273.15
 
    # NASA GISS
-   es = 6.108 * np.exp(2834000 * (0.00000793252 - 0.002166847/T))
+   es = 6.108 * unp.exp(2834000 * (0.00000793252 - 0.002166847/T))
 
    # Tetens
-   es = 6.108 * np.exp((21.875 * TC)/(TC+265.5))
+   es = 6.108 * unp.exp((21.875 * TC)/(TC+265.5))
 
    return es
 ################################################################################
