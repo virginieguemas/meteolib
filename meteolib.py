@@ -16,6 +16,7 @@
 #                    - RHO        -  Air density
 #
 # Author : Virginie Guemas - 2020
+# Modified : Sebastien Blein - January 2021 (uncertainty calculation version)
 ################################################################################
 import numpy as np
 import sys
