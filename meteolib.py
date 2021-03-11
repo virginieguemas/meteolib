@@ -16,7 +16,10 @@
 #                    - RHO        -  Air density
 #
 # Author : Virginie Guemas - 2020
-# Modified : Sebastien Blein - January 2021 (uncertainty calculation version)
+# Modified : Sebastien Blein - January 2021 - Version that accepts unumpy arrays
+#                              storing uncertainties as input and propagates those
+#                              uncertainties until the output, still compatible
+#                              with an usage without uncertainties
 ################################################################################
 import numpy as np
 import sys
@@ -85,6 +88,7 @@ def Thetae(T,q,P,case=4) :
    This function computes the equivalent potential temperature in Kelvin as a function of the temperature in Kelvin, the specific humidity in kg/kg and the pressure in hPa.
 
    Author : Virginie Guemas - 2020
+   Modified : January 2021 - Sebastien Blein - Uncertainty propagation
    """
 
    check_T(T)
@@ -92,7 +96,7 @@ def Thetae(T,q,P,case=4) :
 
    if case == 1:
      Td = TD(T=T, q=q, P=P)
-     Tl = (1/(Td-56)+unp.log(T/Td)/800)**(-1)+56  
+     Tl = (1/(Td-56)+unp.log(T/Td)/800)**(-1)+56
    elif case == 2:
      e = ES(TD(T=T, q=q, P=P))
      Tl = 2840/(3.5*unp.log(T)-unp.log(e)-4.805)+55
@@ -128,6 +132,7 @@ def TD(T,case=2,rh=None,q=None,P=None) :
    This function computes the dew point temperature in Kelvin from the temperature in Kelvin and relative humidity in % or specific humidity in kg/kg and pressure in hPa.
 
    Author : Virginie Guemas - 2020
+   Modified : January 2021 - Sebastien Blein - Uncertainty propagation
    """
 
    check_T(T)
@@ -266,6 +271,7 @@ def ES(T,case=1):
    """ This function computes the saturation vapour pressure in hPa as a function of the temperature in Kelvin.
 
    Author : Virginie Guemas - 2020
+   Modified : January 2021 - Sebastien Blein - Uncertainty propagation
    """
 
    check_T(T)
@@ -288,7 +294,7 @@ def ES(T,case=1):
      es = 6.1121 * unp.exp ((18.678 - TC/234.5)*(TC/(257.14+TC)))
    elif case == 5: 
    # NASA GISS
-     es = 6.108 * unp.exp(2500000 * (0.00000793252 - 0.002166847/T)) 
+     es = 6.108 * unp.exp(2500000 * (0.00000793252 - 0.002166847/T))
    elif case == 6:
    # Tetens (1930) cited by Bolton MWR (1980)
      es = 6.11 * 10**((7.5 * TC)/(TC + 237.3))
@@ -308,6 +314,7 @@ def ESI(T) :
    This function computes the saturation vapour pressure with respect to ice in hPa as a function of the temperature in Kelvin.
 
    Author : Virginie Guemas - 2020
+   Modified : January 2021 - Sebastien Blein - Uncertainty propagation
    """
 
    check_T(T)
