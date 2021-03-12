@@ -99,9 +99,11 @@ def Thetae(T,q,P,case=4) :
      Tl = (1/(Td-56)+unp.log(T/Td)/800)**(-1)+56
    elif case == 2:
      e = ES(TD(T=T, q=q, P=P))
+     e = np.where(unp.nominal_values(e)==0,np.nan,e)
      Tl = 2840/(3.5*unp.log(T)-unp.log(e)-4.805)+55
    elif case == 3:
      rh = RH(T=T, q=q, P=P)
+     rh = np.where(unp.nominal_values(rh)==0,np.nan,rh)
      Tl = (1/(T-55)-unp.log(rh/100)/2840)**(-1)+55
    elif case == 4: # my formula which seems completely different from Bolton
      thetae = Theta(T = T + LV(T)/cp*q, P = P)
@@ -167,6 +169,7 @@ def TD(T,case=2,rh=None,q=None,P=None) :
    else:
      sys.exit('Unknow case')
 
+   rh = np.where(unp.nominal_values(rh)==0,np.nan,rh)
    gamma = unp.log(rh/100) + b*TC/(c+TC)
 
    Tdew = (c * gamma)/(b - gamma) + 273.15
