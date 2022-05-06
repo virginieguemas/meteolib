@@ -187,17 +187,18 @@ def RW(q):
 
    return r
 ################################################################################
-def Q(P,rh=None,Td=None,T=None,case=2):
+def Q(P,rh=None,Td=None,T=None,es=None,case=2):
    """
    This function computes the specific humidity (in kg/kg) as a function of :
    - the dew point temperature Td (in Kelvin), 
-   - the pressure P (in hPa)
+   - the pressure P (in hPa),
    or as a function of :
    - the relative humidity rh (in %),
    - the temperature (in Kelvin),
    - the pressure (in hPa). 
-
    Author : Virginie Guemas - 2020
+   Modified : May 2022 - option Q (ES, P) for internal use.
+   
    """
  
    if Td is not None :
@@ -207,6 +208,8 @@ def Q(P,rh=None,Td=None,T=None,case=2):
      check_T(T)
      check_rh(rh)
      e = rh * ES(T) / 100
+   elif es is not None:
+     e = es
    else:
      sys.exit('q can be computed from (Td,P) or from (rh,T,P)')
 
@@ -218,6 +221,25 @@ def Q(P,rh=None,Td=None,T=None,case=2):
      sys.exit('Unknown case')
  
    return q
+################################################################################
+def QS(T,P, ice=False):
+   """
+   This function computes the saturation specific humidity (in kg/kg) as a function
+   of :
+   - the temperature (in Kelvin)
+   - the pressure (in hPa)
+   - whether ice is present (ice=True) or not (ice=False)
+   
+   Author : Virginie Guemas - 2022
+   """
+
+   check_T(T)
+   
+   es = np.where(ice, ESI(T), ES(T))
+   
+   qs = Q(P,es=es)
+   
+   return qs
 ################################################################################
 def RH(T,Td=None,q=None,P=None,case=2) :
    """ 
@@ -331,7 +353,7 @@ def ESI(T) :
    es = 6.108 * unp.exp((21.875 * TC)/(TC+265.5))
 
    return es
-################################################################################
+###############################################################################
 def LV(T, case=3) :
    """
    This function computes the latent heat of vaporisation/condensation in J.kg-1 as a function of temperature in Kelvin.
