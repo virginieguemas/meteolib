@@ -187,13 +187,13 @@ def RW(q):
 
    return r
 ################################################################################
-def Q(P,rh=None,Td=None,T=None,es=None,case=2):
+def Q(P,rh=None,Td=None,T=None,es=None,ice=False,case=2):
    """
    This function computes the specific humidity (in kg/kg) as a function of :
-   - the dew point temperature Td (in Kelvin), 
+   - the dew point temperature Td (in Kelvin) or frost point if ice = True, 
    - the pressure P (in hPa),
    or as a function of :
-   - the relative humidity rh (in %),
+   - the relative humidity rh (in %) with respect to ice if ice = True,
    - the temperature (in Kelvin),
    - the pressure (in hPa). 
    Author : Virginie Guemas - 2020
@@ -203,11 +203,18 @@ def Q(P,rh=None,Td=None,T=None,es=None,case=2):
  
    if Td is not None :
      check_T(Td)
-     e = ES(Td,case=2)
+     if ice :
+       e = ESI(Td,case=2)
+     else:
+       e = ES(Td,case=2)
    elif rh is not None and T is not None:
      check_T(T)
      check_rh(rh)
-     e = rh * ES(T) / 100
+     if ice : 
+       es = ESI(T)
+     else
+       es = ES(T)
+     e = rh * es / 100
    elif es is not None:
      e = es
    else:
