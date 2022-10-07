@@ -212,7 +212,7 @@ def Q(P,rh=None,Td=None,T=None,es=None,ice=False,case=2):
      check_rh(rh)
      if ice : 
        es = ESI(T)
-     else
+     else:
        es = ES(T)
      e = rh * es / 100
    elif es is not None:
