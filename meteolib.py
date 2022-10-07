@@ -197,23 +197,19 @@ def Q(P,rh=None,Td=None,T=None,es=None,ice=False,case=2):
    - the temperature (in Kelvin),
    - the pressure (in hPa). 
    Author : Virginie Guemas - 2020
-   Modified : May 2022 - option Q (ES, P) for internal use.
-   
+   Modified : May 2022     - Virginie Guemas - option Q (ES, P) for internal use.
+              October 2022 - Virginie Guemas - option ice = True/False to use relative 
+                                               humidity with respect to ice or water
+                                               and dew point or frost point
    """
  
    if Td is not None :
      check_T(Td)
-     if ice :
-       e = ESI(Td,case=2)
-     else:
-       e = ES(Td,case=2)
+     e = np.where(ice, ESI(Td, case = 2), ES(Td, case = 2))
    elif rh is not None and T is not None:
      check_T(T)
      check_rh(rh)
-     if ice : 
-       es = ESI(T)
-     else:
-       es = ES(T)
+     es = np.where(ice, ESI(T), ES(T))
      e = rh * es / 100
    elif es is not None:
      e = es
