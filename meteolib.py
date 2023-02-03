@@ -194,8 +194,8 @@ def Q(P,rh=None,Td=None,T=None,es=None,ice=False,case=2):
    - the pressure P (in hPa),
    or as a function of :
    - the relative humidity rh (in %) with respect to ice if ice = True,
-   - the temperature (in Kelvin),
-   - the pressure (in hPa). 
+   - the temperature T (in Kelvin),
+   - the pressure P (in hPa). 
    Author : Virginie Guemas - 2020
    Modified : May 2022     - Virginie Guemas - option Q (ES, P) for internal use.
               October 2022 - Virginie Guemas - option ice = True/False to use relative 
@@ -205,7 +205,7 @@ def Q(P,rh=None,Td=None,T=None,es=None,ice=False,case=2):
  
    if Td is not None :
      check_T(Td)
-     e = np.where(ice, ESI(Td, case = 2), ES(Td, case = 2))
+     e = np.where(ice, ESI(Td), ES(Td, case = 2))
    elif rh is not None and T is not None:
      check_T(T)
      check_rh(rh)
@@ -407,7 +407,7 @@ def NU(T,case=2):
 ################################################################################
 def RHO(P,T,q):
    """ 
-   This function computes the air density in kg/m3 as a function of pressure (in hPa), temperature (in Kelvin) and specific humidity (in kg/kg).
+   This function computes the air density in kg/m3 as a function of pressure P (in hPa), temperature T (in Kelvin) and specific humidity q (in kg/kg).
     
    Author : Virginie Guemas - January 2021
    """
